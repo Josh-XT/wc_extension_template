@@ -1,0 +1,11 @@
+{
+  "id": "example_extension",
+  "label": "Example Extension",
+  "icon": "dashboard",
+  "layout": "framed",
+  "version": "0.1.0",
+  "entry": "main.js",
+  "requires": {
+    "company_scope": ["ext:example_extension:read"]
+  }
+}
