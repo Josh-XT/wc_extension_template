@@ -5,8 +5,8 @@
  *
  *   POST /v1/extensions/run
  *
- * The matching Rust command module lives in rust/extensions/example_extension.rs
- * and is registered by rust/workconductor.toml during WorkConductor image builds.
+ * The matching Rust command module lives in example_extension.rs and is
+ * registered by workconductor.toml during WorkConductor image builds.
  */
 window.AgixtRegisterExtension('example_extension', {
   mount(container, ctx) {

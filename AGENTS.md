@@ -6,7 +6,7 @@ Guidance for AI assistants and humans working in a WorkConductor Rust extension 
 
 This is a template for building WorkConductor Rust extension hubs plus optional AGiXT Desktop UI bundles.
 
-WorkConductor is the Rust backend replacement for AGiXT. Rust hub sources live in the product hub repository and are copied into WorkConductor's Cargo workspace at image build time. Desktop UI bundles still use the familiar `desktop/<id>/manifest.json` and `desktop/<id>/main.js` shape and are served by WorkConductor's desktop extension endpoints.
+WorkConductor is the Rust backend replacement for AGiXT. Rust hub sources live in the product hub repository and are copied into WorkConductor's Cargo workspace at image build time. Desktop UI bundles live in `ui/` and are served by WorkConductor's desktop extension endpoints.
 
 ## Primary Agent Task
 
@@ -14,11 +14,11 @@ When the user says something like **"Turn this WorkConductor extension template 
 
 Your job is to produce the right combination of:
 
-- Rust command extension under `rust/extensions/` implementing WorkConductor's `Extension` trait.
-- `rust/workconductor.toml` build manifest listing every Rust module and struct exported by the hub.
+- Rust command extension at the repository root implementing WorkConductor's `Extension` trait, for example `example_extension.rs`.
+- `workconductor.toml` build manifest listing every Rust module and struct exported by the hub.
 - `pricing.json` marketplace metadata with `included_extensions` and optional `company_id`/`company_ids`.
 - Optional persistent database/API changes in WorkConductor when the feature needs real server-side state.
-- Optional desktop UI bundle that calls the Rust backend with `ctx.serverUrl` and `ctx.jwt`.
+- Optional desktop UI bundle under `ui/` that calls the Rust backend with `ctx.serverUrl` and `ctx.jwt`.
 - Documentation and validation commands.
 
 ## Build Workflow
@@ -37,8 +37,8 @@ Your job is to produce the right combination of:
 
 | Need | Build This |
 | --- | --- |
-| Agent command calls a service | Rust `Extension` implementation in `rust/extensions/` with settings, client helper, commands, and structured errors. |
-| Desktop page for the extension | `desktop/<id>/manifest.json` plus `desktop/<id>/main.js` registered with `window.AgixtRegisterExtension`. |
+| Agent command calls a service | Rust `Extension` implementation in a root-level `<extension_slug>.rs` file with settings, client helper, commands, and structured errors. |
+| Desktop page for the extension | `ui/manifest.json` plus `ui/main.js` registered with `window.AgixtRegisterExtension`. |
 | User/company-owned persisted records | Add AGiXT-compatible tables and Axum endpoints in WorkConductor proper. Keep SQLite/Postgres parity. |
 | Existing WorkConductor route integration | Use the existing `/v1/...` route from the desktop UI; do not duplicate logic in the UI. |
 | External webhook or realtime flow | Add explicit authenticated Axum routes/WebSockets in WorkConductor proper. |
@@ -52,15 +52,15 @@ Your job is to produce the right combination of:
 5. Do not fake mutating commands. If the command says it created/updated/deleted something, it must actually do that.
 6. Use safe Rust. Avoid `unsafe`.
 7. Desktop UI gating is not authorization. The backend must enforce access.
-8. Bump `desktop/<id>/manifest.json` `version` whenever `main.js` changes.
+8. Bump `ui/manifest.json` `version` whenever `main.js` changes.
 9. Keep the template honest about WorkConductor's current loading model: Rust hubs are installed at image build time and compiled into the backend binary.
 
 ## Integration Into WorkConductor
 
-For a compiled extension hub, keep the finalized Rust module in:
+For a compiled extension hub, keep the finalized Rust module at the repository root:
 
 ```text
-rust/extensions/<extension_slug>.rs
+<extension_slug>.rs
 ```
 
 The implementation should import traits from `crate::traits::{...}` so it compiles both in this local harness and after WorkConductor copies it into `agixt-extensions`.
@@ -68,8 +68,10 @@ The implementation should import traits from `crate::traits::{...}` so it compil
 Declare the module and struct in:
 
 ```text
-rust/workconductor.toml
+workconductor.toml
 ```
+
+`src/lib.rs` is only a local compile/test adapter. It is not the WorkConductor extension entry point and should only mirror enough of WorkConductor's trait surface to validate the real root-level module.
 
 Then install the hub into WorkConductor by cloning/copying it under:
 
@@ -86,8 +88,8 @@ From this template repo:
 ```bash
 cargo fmt --check
 cargo test
-node --check desktop/example_extension/main.js
-python -m json.tool desktop/example_extension/manifest.json >/dev/null
+node --check ui/main.js
+python -m json.tool ui/manifest.json >/dev/null
 python -m json.tool pricing.json >/dev/null
 ```
 

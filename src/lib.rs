@@ -1,9 +1,10 @@
 //! Local validation harness for the example WorkConductor extension.
 //!
-//! The real hub source lives in `rust/extensions/example_extension.rs`. This
-//! crate exposes a minimal copy of WorkConductor's extension trait surface at
-//! `crate::traits` so the same file compiles here and after WorkConductor copies
-//! it into `agixt-extensions` during image builds.
+//! The real hub source lives in `example_extension.rs` at the repository root.
+//! This crate is only a local compile/test adapter: it exposes a minimal copy of
+//! WorkConductor's extension trait surface at `crate::traits` so the same file
+//! compiles here and after WorkConductor copies it into `agixt-extensions`
+//! during image builds.
 
 pub mod traits {
     use serde::{Deserialize, Serialize};
@@ -154,7 +155,7 @@ pub mod traits {
     }
 }
 
-#[path = "../rust/extensions/example_extension.rs"]
+#[path = "../example_extension.rs"]
 pub mod example_extension;
 
 pub use example_extension::{ExampleExtension, ExampleItem};

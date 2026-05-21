@@ -12,16 +12,13 @@ WorkConductor repository only provides the build-time installer.
 
 ```text
 wc_extension_template/
-├── rust/
-│   ├── workconductor.toml                  # Build-time Rust hub manifest
-│   └── extensions/
-│       └── example_extension.rs            # Example Rust command extension
+├── workconductor.toml                      # Build-time Rust hub manifest
+├── example_extension.rs                    # Example Rust command extension
 ├── src/
-│   └── lib.rs                              # Local validation harness
-├── desktop/
-│   └── example_extension/
-│       ├── manifest.json                   # Desktop UI manifest
-│       └── main.js                         # Desktop UI calling WorkConductor
+│   └── lib.rs                              # Local compile/test adapter only
+├── ui/
+│   ├── manifest.json                       # Desktop UI manifest
+│   └── main.js                             # Desktop UI calling WorkConductor
 ├── .github/
 │   └── prompts/
 │       └── create-workconductor-extension.prompt.md
@@ -31,8 +28,8 @@ wc_extension_template/
 └── README.md
 ```
 
-The Rust example in `rust/extensions/example_extension.rs` implements
-WorkConductor's `Extension` trait and exposes:
+The Rust example in `example_extension.rs` implements WorkConductor's
+`Extension` trait and exposes:
 
 - `Create Example Item`
 - `List Example Items`
@@ -52,16 +49,24 @@ WorkConductor does not load Rust source files at runtime. Instead, the Docker
 build copies hub-owned Rust sources into the Cargo workspace before compiling
 the `agixt` binary.
 
-The build installer reads:
+The preferred hub layout is flat:
 
 ```text
-rust/workconductor.toml
-rust/extensions/*.rs
-rust/api/endpoints/*.rs
-rust/crates/*
+workconductor.toml
+*.rs
+extensions/*.rs
+api/endpoints/*.rs
+crates/*
+ui/manifest.json
+ui/<extension-id>/manifest.json
+ui/main.js
 ```
 
-For command extensions, declare modules in `rust/workconductor.toml`:
+Small single-extension hubs can keep the Rust module at the repository root.
+Larger hubs can use a root-level `extensions/` folder to avoid clutter while
+still avoiding the old extra `rust/` wrapper.
+
+For command extensions, declare modules in `workconductor.toml`:
 
 ```toml
 [extensions]
@@ -81,14 +86,15 @@ Run validation from this repo:
 ```bash
 cargo fmt --check
 cargo test
-node --check desktop/example_extension/main.js
-python -m json.tool desktop/example_extension/manifest.json >/dev/null
+node --check ui/main.js
+python -m json.tool ui/manifest.json >/dev/null
 python -m json.tool pricing.json >/dev/null
 ```
 
-The local Cargo crate is only a harness. It defines a minimal `crate::traits`
-module matching WorkConductor's extension trait surface, then compiles the real
-hub source from `rust/extensions/example_extension.rs`.
+The local Cargo crate is only a compile/test adapter. `src/lib.rs` is not the
+WorkConductor entry point; it defines a minimal `crate::traits` module matching
+WorkConductor's extension trait surface, then compiles the real hub source from
+`example_extension.rs`.
 
 ## Building With WorkConductor
 
@@ -152,10 +158,10 @@ desktop UI bundles, extension settings, and commands from other companies.
 
 ## Desktop UI
 
-Desktop bundles keep the existing AGiXT Desktop contract:
+Desktop bundles use the flatter WorkConductor hub layout:
 
-- `desktop/<id>/manifest.json`
-- `desktop/<id>/main.js`
+- `ui/manifest.json`
+- `ui/main.js`
 - `window.AgixtRegisterExtension(id, controller)`
 
 Use `ctx.serverUrl` and `ctx.jwt` for authenticated calls. For command-backed
@@ -181,13 +187,13 @@ reloads it.
 ## Turning This Into A Real Extension
 
 1. Pick a lowercase snake_case extension slug.
-2. Rename `example_extension`, `ExampleExtension`, command names, desktop folder,
-   manifest ID, JavaScript registration ID, scope strings, labels, tests, and
-   README examples.
-3. Update `rust/workconductor.toml` with the new module and struct.
+2. Rename `example_extension`, `ExampleExtension`, command names, manifest ID,
+   JavaScript registration ID, scope strings, labels, tests, and README
+   examples.
+3. Update `workconductor.toml` with the new module and struct.
 4. Update `pricing.json` with `app_name`, `app_slug`, `included_extensions`, and
    optional `company_id`/`company_ids`.
-5. Implement command logic in `rust/extensions/<extension_slug>.rs`.
+5. Implement command logic in `<extension_slug>.rs`.
 6. Add explicit settings through `settings()` and read them in `init()` or from
    injected runtime args when appropriate.
 7. If the feature needs custom WorkConductor API routes or database tables, add

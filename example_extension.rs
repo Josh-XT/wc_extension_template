@@ -2,8 +2,9 @@
 //!
 //! This module is intentionally small and self-contained so an agent can turn it
 //! into a real WorkConductor Rust extension hub. WorkConductor copies
-//! `rust/extensions/*.rs` into the `agixt-extensions` crate during image builds
-//! and generates registration from `rust/workconductor.toml`.
+//! root-level extension modules listed in `workconductor.toml` into the
+//! `agixt-extensions` crate during image builds and generates registration from
+//! that manifest.
 
 use crate::traits::{ArgumentMetadata, CommandMetadata, Extension, SettingMetadata};
 use anyhow::{anyhow, Result};
