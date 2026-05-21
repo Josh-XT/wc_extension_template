@@ -14,7 +14,7 @@ When the user says something like **"Turn this WorkConductor extension template 
 
 Your job is to produce the right combination of:
 
-- Rust command extension at the repository root implementing WorkConductor's `Extension` trait, for example `example_extension.rs`.
+- Rust command extension at the repository root implementing WorkConductor's `Extension` trait, for example `example_extension.rs`, or under `extensions/` for larger multi-extension hubs.
 - `workconductor.toml` build manifest listing every Rust module and struct exported by the hub.
 - `pricing.json` marketplace metadata with `included_extensions` and optional `company_id`/`company_ids`.
 - Optional persistent database/API changes in WorkConductor when the feature needs real server-side state.
@@ -37,7 +37,7 @@ Your job is to produce the right combination of:
 
 | Need | Build This |
 | --- | --- |
-| Agent command calls a service | Rust `Extension` implementation in a root-level `<extension_slug>.rs` file with settings, client helper, commands, and structured errors. |
+| Agent command calls a service | Rust `Extension` implementation in a root-level `<extension_slug>.rs` file, or `extensions/<extension_slug>.rs` for larger hubs, with settings, client helper, commands, and structured errors. |
 | Desktop page for the extension | `ui/manifest.json` plus `ui/main.js` registered with `window.AgixtRegisterExtension`. |
 | User/company-owned persisted records | Add AGiXT-compatible tables and Axum endpoints in WorkConductor proper. Keep SQLite/Postgres parity. |
 | Existing WorkConductor route integration | Use the existing `/v1/...` route from the desktop UI; do not duplicate logic in the UI. |
@@ -57,10 +57,16 @@ Your job is to produce the right combination of:
 
 ## Integration Into WorkConductor
 
-For a compiled extension hub, keep the finalized Rust module at the repository root:
+For a small compiled extension hub, keep the finalized Rust module at the repository root:
 
 ```text
 <extension_slug>.rs
+```
+
+For larger hubs, use:
+
+```text
+extensions/<extension_slug>.rs
 ```
 
 The implementation should import traits from `crate::traits::{...}` so it compiles both in this local harness and after WorkConductor copies it into `agixt-extensions`.

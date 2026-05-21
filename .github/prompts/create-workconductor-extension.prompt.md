@@ -25,7 +25,7 @@ Build requirements:
 
 1. Choose a lowercase snake_case extension slug and a PascalCase Rust struct name. Rename `example_extension`, `ExampleExtension`, command names, manifest ID, JavaScript registration ID, scopes, visible labels, and tests consistently.
 2. Decide whether this is a command-only connector, a database-backed WorkConductor feature, a desktop UI feature, or a hybrid. Keep only the capabilities that fit the request.
-3. Implement WorkConductor commands in `<extension_slug>.rs` at the repository root with WorkConductor's `Extension` trait. Use `CommandMetadata`, `ArgumentMetadata`, and `SettingMetadata` so WorkConductor can seed command metadata and settings.
+3. Implement WorkConductor commands in `<extension_slug>.rs` at the repository root, or `extensions/<extension_slug>.rs` for larger hubs, with WorkConductor's `Extension` trait. Use `CommandMetadata`, `ArgumentMetadata`, and `SettingMetadata` so WorkConductor can seed command metadata and settings.
 4. Keep command implementations deterministic and backend-authoritative. If a command mutates state, use safe interior mutability or a real database-backed service layer; do not fake success.
 5. Update `workconductor.toml` so the build-time installer can register the module and struct.
 6. Update `pricing.json` with `app_name`, `app_slug`, `marketplace.included_extensions`, and optional company restrictions.
