@@ -4,9 +4,9 @@ Guidance for AI assistants and humans working in a WorkConductor Rust extension 
 
 ## What This Repo Is
 
-This is a template for building WorkConductor Rust command extensions plus optional AGiXT Desktop UI bundles.
+This is a template for building WorkConductor Rust extension hubs plus optional AGiXT Desktop UI bundles.
 
-WorkConductor is the Rust backend replacement for AGiXT. Unlike AGiXT Python extension hubs, Rust command extensions are currently compiled into WorkConductor's `agixt-extensions` crate. Desktop UI bundles still use the familiar `desktop/<id>/manifest.json` and `desktop/<id>/main.js` shape and are served by WorkConductor's desktop extension endpoints.
+WorkConductor is the Rust backend replacement for AGiXT. Rust hub sources live in the product hub repository and are copied into WorkConductor's Cargo workspace at image build time. Desktop UI bundles still use the familiar `desktop/<id>/manifest.json` and `desktop/<id>/main.js` shape and are served by WorkConductor's desktop extension endpoints.
 
 ## Primary Agent Task
 
@@ -14,7 +14,9 @@ When the user says something like **"Turn this WorkConductor extension template 
 
 Your job is to produce the right combination of:
 
-- Rust command extension implementing WorkConductor's `Extension` trait.
+- Rust command extension under `rust/extensions/` implementing WorkConductor's `Extension` trait.
+- `rust/workconductor.toml` build manifest listing every Rust module and struct exported by the hub.
+- `pricing.json` marketplace metadata with `included_extensions` and optional `company_id`/`company_ids`.
 - Optional persistent database/API changes in WorkConductor when the feature needs real server-side state.
 - Optional desktop UI bundle that calls the Rust backend with `ctx.serverUrl` and `ctx.jwt`.
 - Documentation and validation commands.
@@ -26,7 +28,7 @@ Your job is to produce the right combination of:
 3. Implement real command logic in Rust. Use clear helpers and return structured JSON values from `execute`.
 4. Use explicit settings in `settings()` and consume them in `init()`.
 5. Keep command metadata accurate. WorkConductor uses it for command seeding, argument coercion, and UI display.
-6. If the feature needs persistent database state or custom HTTP routes, make the corresponding WorkConductor backend changes. Do not imply standalone Rust repos can dynamically register Axum routes at runtime.
+6. If the feature needs persistent database state or custom HTTP routes, make the corresponding WorkConductor backend changes. Hub Rust command modules are build-time installed; they do not dynamically register Axum routes at runtime.
 7. Make the desktop UI match the backend. For command-backed screens, call `POST /v1/extensions/run`; for core WorkConductor APIs, call the real `/v1/...` endpoints.
 8. Update README and tests.
 9. Validate with formatting, Rust checks/tests, JSON parsing, and JavaScript syntax checks.
@@ -35,7 +37,7 @@ Your job is to produce the right combination of:
 
 | Need | Build This |
 | --- | --- |
-| Agent command calls a service | Rust `Extension` implementation with settings, client helper, commands, and structured errors. |
+| Agent command calls a service | Rust `Extension` implementation in `rust/extensions/` with settings, client helper, commands, and structured errors. |
 | Desktop page for the extension | `desktop/<id>/manifest.json` plus `desktop/<id>/main.js` registered with `window.AgixtRegisterExtension`. |
 | User/company-owned persisted records | Add AGiXT-compatible tables and Axum endpoints in WorkConductor proper. Keep SQLite/Postgres parity. |
 | Existing WorkConductor route integration | Use the existing `/v1/...` route from the desktop UI; do not duplicate logic in the UI. |
@@ -51,29 +53,31 @@ Your job is to produce the right combination of:
 6. Use safe Rust. Avoid `unsafe`.
 7. Desktop UI gating is not authorization. The backend must enforce access.
 8. Bump `desktop/<id>/manifest.json` `version` whenever `main.js` changes.
-9. Keep the template honest about WorkConductor's current loading model: Rust extensions are compiled in.
+9. Keep the template honest about WorkConductor's current loading model: Rust hubs are installed at image build time and compiled into the backend binary.
 
 ## Integration Into WorkConductor
 
-For a compiled extension, copy the finalized Rust module into:
+For a compiled extension hub, keep the finalized Rust module in:
 
 ```text
-WorkConductor/agixt-rust/crates/agixt-extensions/src/<extension_slug>.rs
+rust/extensions/<extension_slug>.rs
 ```
 
-The implementation should live in `src/<extension_slug>.rs` and import traits from `crate::traits::{...}`. The template's `src/lib.rs` exists only as a local validation harness that re-exports WorkConductor's traits.
+The implementation should import traits from `crate::traits::{...}` so it compiles both in this local harness and after WorkConductor copies it into `agixt-extensions`.
 
-Then update:
-
-- `crates/agixt-extensions/src/lib.rs` with `pub mod <extension_slug>;` and `pub use <extension_slug>::StructName;`.
-- `crates/agixt-api/src/main.rs` built-in extension registration lists with `Arc::new(agixt_extensions::StructName::new())`.
-
-If the desktop bundle should ship with WorkConductor or AGiXT Desktop, place it under an extension hub searched by WorkConductor, such as:
+Declare the module and struct in:
 
 ```text
-<hub>/desktop/<extension_slug>/manifest.json
-<hub>/desktop/<extension_slug>/main.js
+rust/workconductor.toml
 ```
+
+Then install the hub into WorkConductor by cloning/copying it under:
+
+```text
+WorkConductor/agixt-rust/extensions_hubs/<hub_name>/
+```
+
+or by passing it through WorkConductor's `EXTENSIONS_HUB` build arg. WorkConductor's Docker builder copies Rust sources and generates hub registration automatically.
 
 ## Local Validation
 
@@ -84,15 +88,14 @@ cargo fmt --check
 cargo test
 node --check desktop/example_extension/main.js
 python -m json.tool desktop/example_extension/manifest.json >/dev/null
+python -m json.tool pricing.json >/dev/null
 ```
 
 After integrating into WorkConductor:
 
 ```bash
 cd ../WorkConductor/agixt-rust
-cargo fmt -p agixt-extensions -p agixt-api
-cargo check -p agixt-extensions
-cargo check -p agixt-api
+docker compose -f docker/docker-compose.yml build agixt-api
 ```
 
 Then run WorkConductor and verify:

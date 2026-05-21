@@ -1,0 +1,9 @@
+[hub]
+id = "example-extension"
+name = "Example Extension"
+description = "Example WorkConductor Rust extension hub."
+
+[extensions]
+modules = [
+  { module = "example_extension", struct = "ExampleExtension" },
+]

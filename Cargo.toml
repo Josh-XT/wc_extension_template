@@ -6,7 +6,6 @@ license = "MIT"
 publish = false
 
 [dependencies]
-agixt-extensions = { path = "../WorkConductor/agixt-rust/crates/agixt-extensions" }
 anyhow = "1"
 chrono = { version = "0.4", features = ["serde"] }
 serde = { version = "1", features = ["derive"] }

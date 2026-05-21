@@ -1,0 +1,12 @@
+{
+  "app_name": "Example Extension",
+  "app_slug": "example-extension",
+  "marketplace": {
+    "listed": false,
+    "included_extensions": [
+      "Example Extension",
+      "ExampleExtension",
+      "example_extension"
+    ]
+  }
+}
