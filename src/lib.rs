@@ -1,9 +1,9 @@
-//! Local validation harness for the example WorkConductor extension.
+//! Local validation harness for the example AGiXT v2 extension.
 //!
 //! The real hub source lives in `example_extension.rs` at the repository root.
 //! This crate is only a local compile/test adapter: it exposes a minimal copy of
-//! WorkConductor's extension trait surface at `crate::traits` so the same file
-//! compiles here and after WorkConductor copies it into `agixt-extensions`
+//! AGiXT v2's extension trait surface at `crate::traits` so the same file
+//! compiles here and after AGiXT v2 copies it into `agixt-extensions`
 //! during image builds.
 
 pub mod traits {

@@ -1,8 +1,8 @@
-//! Example WorkConductor extension module.
+//! Example AGiXT v2 extension module.
 //!
 //! This module is intentionally small and self-contained so an agent can turn it
-//! into a real WorkConductor Rust extension hub. WorkConductor copies
-//! root-level extension modules listed in `workconductor.toml` into the
+//! into a real AGiXT v2 Rust extension hub. AGiXT v2 copies
+//! root-level extension modules listed in `extension.toml` into the
 //! `agixt-extensions` crate during image builds and generates registration from
 //! that manifest.
 
@@ -35,7 +35,7 @@ impl ExampleExtension {
     pub fn new() -> Self {
         Self {
             items: Mutex::new(HashMap::new()),
-            greeting: "Hello from a WorkConductor Rust extension.".to_string(),
+            greeting: "Hello from an AGiXT v2 Rust extension.".to_string(),
         }
     }
 
@@ -181,7 +181,7 @@ impl Extension for ExampleExtension {
     }
 
     fn description(&self) -> String {
-        "Example WorkConductor Rust extension with CRUD-style commands.".to_string()
+        "Example AGiXT v2 Rust extension with CRUD-style commands.".to_string()
     }
 
     fn category(&self) -> String {
@@ -235,7 +235,7 @@ impl Extension for ExampleExtension {
             "Greeting included in create responses",
             "string",
         )
-        .with_default("Hello from a WorkConductor Rust extension.")]
+        .with_default("Hello from an AGiXT v2 Rust extension.")]
     }
 
     fn init(&mut self, settings: &HashMap<String, String>) -> Result<()> {

@@ -1,12 +1,12 @@
-/* Example WorkConductor desktop extension.
+/* Example AGiXT v2 desktop extension.
  *
- * This UI talks to the Rust backend through WorkConductor's generic command
+ * This UI talks to the Rust backend through AGiXT v2's generic command
  * execution endpoint:
  *
  *   POST /v1/extensions/run
  *
  * The matching Rust command module lives in example_extension.rs and is
- * registered by workconductor.toml during WorkConductor image builds.
+ * registered by extension.toml during AGiXT v2 image builds.
  */
 window.AgixtRegisterExtension('example_extension', {
   mount(container, ctx) {

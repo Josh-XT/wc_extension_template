@@ -1,7 +1,7 @@
 [hub]
 id = "example-extension"
 name = "Example Extension"
-description = "Example WorkConductor Rust extension hub."
+description = "Example AGiXT v2 Rust extension hub."
 
 [extensions]
 modules = [

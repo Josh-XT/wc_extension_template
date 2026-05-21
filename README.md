@@ -1,24 +1,24 @@
-# WorkConductor Extension Template
+# AGiXT v2 Extension Template
 
-A starter template for building WorkConductor Rust extension hubs plus optional
+A starter template for building AGiXT v2 Rust extension hubs plus optional
 AGiXT Desktop UI bundles.
 
 This is the Rust counterpart to the AGiXT Python `extension_template` repo. The
-important difference is that WorkConductor compiles Rust hub sources into the
-backend image at build time. The hub repository owns the product code; the core
-WorkConductor repository only provides the build-time installer.
+important difference is that AGiXT v2 compiles Rust hub sources into the backend
+image at build time. The hub repository owns the product code; the core AGiXT v2
+repository only provides the build-time installer.
 
 ## What's In The Box
 
 ```text
 wc_extension_template/
-├── workconductor.toml                      # Build-time Rust hub manifest
+├── extension.toml                      # Build-time Rust hub manifest
 ├── example_extension.rs                    # Example Rust command extension
 ├── src/
 │   └── lib.rs                              # Local compile/test adapter only
 ├── ui/
 │   ├── manifest.json                       # Desktop UI manifest
-│   └── main.js                             # Desktop UI calling WorkConductor
+│   └── main.js                             # Desktop UI calling AGiXT v2
 ├── .github/
 │   └── prompts/
 │       └── create-workconductor-extension.prompt.md
@@ -28,7 +28,7 @@ wc_extension_template/
 └── README.md
 ```
 
-The Rust example in `example_extension.rs` implements WorkConductor's
+The Rust example in `example_extension.rs` implements AGiXT v2's
 `Extension` trait and exposes:
 
 - `Create Example Item`
@@ -37,7 +37,7 @@ The Rust example in `example_extension.rs` implements WorkConductor's
 - `Update Example Item`
 - `Delete Example Item`
 
-The desktop example calls WorkConductor's generic command endpoint:
+The desktop example calls AGiXT v2's generic command endpoint:
 
 ```http
 POST /v1/extensions/run
@@ -45,14 +45,14 @@ POST /v1/extensions/run
 
 ## Loading Model
 
-WorkConductor does not load Rust source files at runtime. Instead, the Docker
+AGiXT v2 does not load Rust source files at runtime. Instead, the Docker
 build copies hub-owned Rust sources into the Cargo workspace before compiling
 the `agixt` binary.
 
 The preferred hub layout is flat:
 
 ```text
-workconductor.toml
+extension.toml
 *.rs
 extensions/*.rs
 api/endpoints/*.rs
@@ -66,7 +66,7 @@ Small single-extension hubs can keep the Rust module at the repository root.
 Larger hubs can use a root-level `extensions/` folder to avoid clutter while
 still avoiding the old extra `rust/` wrapper.
 
-For command extensions, declare modules in `workconductor.toml`:
+For command extensions, declare modules in `extension.toml`:
 
 ```toml
 [extensions]
@@ -75,7 +75,7 @@ modules = [
 ]
 ```
 
-WorkConductor generates `hub_generated.rs` during the image build so those
+AGiXT v2 generates `hub_generated.rs` during the image build so those
 commands are registered, seeded, and listed without storing product
 implementations in the core repository.
 
@@ -92,11 +92,11 @@ python -m json.tool pricing.json >/dev/null
 ```
 
 The local Cargo crate is only a compile/test adapter. `src/lib.rs` is not the
-WorkConductor entry point; it defines a minimal `crate::traits` module matching
-WorkConductor's extension trait surface, then compiles the real hub source from
+AGiXT v2 entry point; it defines a minimal `crate::traits` module matching
+AGiXT v2's extension trait surface, then compiles the real hub source from
 `example_extension.rs`.
 
-## Building With WorkConductor
+## Building With AGiXT v2
 
 Clone or copy this hub into WorkConductor's ignored hub folder:
 
@@ -104,14 +104,14 @@ Clone or copy this hub into WorkConductor's ignored hub folder:
 WorkConductor/agixt-rust/extensions_hubs/example_extension/
 ```
 
-Then build WorkConductor:
+Then build AGiXT v2:
 
 ```bash
 cd ../WorkConductor/agixt-rust
 docker compose -f docker/docker-compose.yml build agixt-api
 ```
 
-You can also pass the repository through WorkConductor's build-time hub pull:
+You can also pass the repository through AGiXT v2's build-time hub pull:
 
 ```bash
 export EXTENSIONS_HUB="owner/example-extension-repo"
@@ -190,7 +190,7 @@ reloads it.
 2. Rename `example_extension`, `ExampleExtension`, command names, manifest ID,
    JavaScript registration ID, scope strings, labels, tests, and README
    examples.
-3. Update `workconductor.toml` with the new module and struct.
+3. Update `extension.toml` with the new module and struct.
 4. Update `pricing.json` with `app_name`, `app_slug`, `included_extensions`, and
    optional `company_id`/`company_ids`.
 5. Implement command logic in `<extension_slug>.rs`.
