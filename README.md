@@ -101,14 +101,14 @@ AGiXT v2's extension trait surface, then compiles the real hub source from
 Clone or copy this hub into WorkConductor's ignored hub folder:
 
 ```text
-WorkConductor/agixt-rust/extensions_hubs/example_extension/
+WorkConductor/agixt/extensions_hubs/example_extension/
 ```
 
 Then build AGiXT v2:
 
 ```bash
-cd ../WorkConductor/agixt-rust
-docker compose -f docker/docker-compose.yml build agixt-api
+cd ../WorkConductor
+docker compose build agixt-api
 ```
 
 You can also pass the repository through AGiXT v2's build-time hub pull:
@@ -116,7 +116,7 @@ You can also pass the repository through AGiXT v2's build-time hub pull:
 ```bash
 export EXTENSIONS_HUB="owner/example-extension-repo"
 export EXTENSIONS_HUB_BRANCH="main"
-docker compose -f docker/docker-compose.yml build agixt-api
+docker compose build agixt-api
 ```
 
 For private hubs, pass the GitHub token as the BuildKit secret supported by

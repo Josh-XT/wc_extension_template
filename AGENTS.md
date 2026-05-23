@@ -82,7 +82,7 @@ extension.toml
 Then install the hub into AGiXT v2 by cloning/copying it under:
 
 ```text
-WorkConductor/agixt-rust/extensions_hubs/<hub_name>/
+WorkConductor/agixt/extensions_hubs/<hub_name>/
 ```
 
 or by passing it through AGiXT v2's `EXTENSIONS_HUB` build arg. AGiXT v2's Docker builder copies Rust sources and generates hub registration automatically.
@@ -102,8 +102,8 @@ python -m json.tool pricing.json >/dev/null
 After integrating into AGiXT v2:
 
 ```bash
-cd ../WorkConductor/agixt-rust
-docker compose -f docker/docker-compose.yml build agixt-api
+cd ../WorkConductor
+docker compose build agixt-api
 ```
 
 Then run WorkConductor and verify:
